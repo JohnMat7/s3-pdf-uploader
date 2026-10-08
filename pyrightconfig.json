@@ -1,0 +1,11 @@
+{
+  "include": [
+    "pdf_management_system"
+  ],
+  "extraPaths": [
+    "pdf_management_system",
+    "pdf_uploader_env/lib/python3.10/site-packages"
+  ],
+  "typeCheckingMode": "standard"
+}
+
