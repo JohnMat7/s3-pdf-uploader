@@ -1,4 +1,5 @@
 services:
+<<<<<<< HEAD
   backend:
     image: uploader-backend
     ports:
@@ -18,3 +19,71 @@ services:
     image: uploader-frontend
     ports:
       - "8080:80"
+=======
+  # Local Postgres for local development/testing before deploying to RDS
+  postgres:
+    image: postgres:15-alpine
+    container_name: local-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: pdf_management
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # MinIO for local development/testing when STORAGE_PROVIDER=minio
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
+  # FastAPI Backend Service
+  pdf-management-system:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pdf-management-system:latest
+    container_name: pdf-management-system
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./pdf_management_system/upload_pdf:/app/upload_pdf
+      - ./pdf_management_system/.env:/app/.env
+    environment:
+      - STORAGE_PROVIDER=minio
+      - MINIO_ENDPOINT=minio:9000
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/pdf_management
+    depends_on:
+      - minio
+      - postgres
+
+  # Nginx Frontend Service
+  frontend:
+    build:
+      context: ./vanilla_frontend
+      dockerfile: Dockerfile
+    image: pdf-uploader-frontend:latest
+    container_name: pdf-uploader-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - pdf-management-system
+
+volumes:
+  minio_data:
+  postgres_data:
+>>>>>>> b1cec3774fe090fbd2462608a2be765cbd3fd3ec
