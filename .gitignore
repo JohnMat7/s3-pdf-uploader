@@ -1,0 +1,14 @@
+pdf_uploader_env
+.dockerignore
+docker_run_commands.txt
+.ruff_cache
+pdf_management_system/app/__pycache__/
+.role_binding.yaml
+.role.yaml
+.service_account.yaml
+token
+gitlab-config
+config
+docker-compose_bkp.yml
+unimportant/
+pdf_env/

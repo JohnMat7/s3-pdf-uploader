@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Uploader</title>
+  <style>
+    body {font-family: Arial, sans-serif; margin: 2rem;}
+    form {display: flex; flex-direction: column; max-width: 400px;}
+    input[type="file"] {margin-bottom: 1rem;}
+    button {padding: 0.5rem;}
+    #msg {margin-top: 1rem;}
+  </style>
+</head>
+<body>
+  <h1>Upload Media</h1>
+  <form id="uploadForm">
+    <input type="file" name="file" id="fileInput" required />
+    <button type="submit">Upload</button>
+  </form>
+  <div id="msg"></div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const msgDiv = document.getElementById('msg');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const resp = await fetch('http://localhost:5000/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+          msgDiv.textContent = '✅ ' + data.message + ' (Key: ' + data.s3_key + ')';
+        } else {
+          msgDiv.textContent = '❌ Error: ' + (data.error || resp.statusText);
+        }
+      } catch (err) {
+        msgDiv.textContent = '❌ Network error: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
+
