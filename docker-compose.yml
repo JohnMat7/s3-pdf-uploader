@@ -1,0 +1,20 @@
+services:
+  backend:
+    image: uploader-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - AWS_REGION=${AWS_REGION}
+      - S3_BUCKET=${S3_BUCKET}
+      - POSTGRES_DSN=${POSTGRES_DSN}
+    # Uncomment if you need to wait for RDS to be reachable
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+
+  frontend:
+    image: uploader-frontend
+    ports:
+      - "8080:80"
