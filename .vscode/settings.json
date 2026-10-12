@@ -1,7 +1,0 @@
-{
-    "python.defaultInterpreterPath": "${workspaceFolder}/pdf_uploader_env/bin/python",
-    "python.analysis.extraPaths": [
-        "${workspaceFolder}/pdf_management_system"
-    ]
-}
-
