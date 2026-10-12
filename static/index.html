@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Upload to S3</title>
+    <style>
+        body {font-family: Arial, sans-serif; margin: 2rem;}
+        .container {max-width: 500px; margin: auto;}
+        input, button {width: 100%; padding: 0.5rem; margin-top: 0.5rem;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Upload a file</h2>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <label for="user">User:</label>
+            <input type="text" id="user" name="user" required />
+            <label for="file">File:</label>
+            <input type="file" id="file" name="file" required />
+            <button type="submit">Upload</button>
+        </form>
+        <pre id="result" style="margin-top:1rem; background:#f0f0f0; padding:1rem; display:none;"></pre>
+    </div>
+    <script>
+        const form = document.getElementById('uploadForm');
+        const result = document.getElementById('result');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            try {
+                const resp = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await resp.json();
+                result.style.display = 'block';
+                if (resp.ok) {
+                    result.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    result.textContent = 'Error: ' + data.detail;
+                }
+            } catch (err) {
+                result.style.display = 'block';
+                result.textContent = 'Network error: ' + err;
+            }
+        });
+    </script>
+</body>
+</html>
+
