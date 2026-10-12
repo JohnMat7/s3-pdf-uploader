@@ -4,8 +4,7 @@ from datetime import datetime
 
 import boto3
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 
 from .database import SessionLocal, engine
@@ -19,8 +18,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 # Mount static files (frontend) directory
-static_path = os.path.join(os.path.dirname(__file__), "..", "static")
-app.mount("/static", StaticFiles(directory=static_path), name="static")
+# Static files are served by the separate Nginx container (frontend service)
 
 # Initialize S3 client using environment variables
 s3_client = boto3.client(
@@ -35,11 +33,10 @@ S3_BUCKET = os.getenv("S3_BUCKET")
 if not S3_BUCKET:
     raise RuntimeError("S3_BUCKET environment variable not set")
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=RedirectResponse)
 async def read_root():
-    index_path = os.path.join(os.path.dirname(__file__), "..", "static", "index.html")
-    with open(index_path, "r") as f:
-        return HTMLResponse(content=f.read())
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:8080")
+    return RedirectResponse(url=frontend_url)
 
 class UploadResponse(BaseModel):
     filename: str
